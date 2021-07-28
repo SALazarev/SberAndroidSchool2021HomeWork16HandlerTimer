@@ -23,7 +23,7 @@ class Timer(tv: WeakReference<TextView>, private val startTime: Int) {
     }
 
     constructor(tv: WeakReference<TextView>, startTime: Int, buffTime: Int) : this(tv, startTime) {
-        start(buffTime)
+        if (buffTime != startTime) start(buffTime)
         textView.text = buffTime.toString()
     }
 
