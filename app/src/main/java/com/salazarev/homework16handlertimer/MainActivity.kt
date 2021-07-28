@@ -7,10 +7,14 @@ import android.widget.Button
 import android.widget.TextView
 import java.lang.ref.WeakReference
 
-private lateinit var timerTv: TextView
-private lateinit var startBtn: Button
-
 class MainActivity : AppCompatActivity() {
+    companion object {
+        private const val TIMER = "TIMER"
+    }
+
+    private lateinit var timerTv: TextView
+    private lateinit var startBtn: Button
+
     private lateinit var timer: Timer
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,10 +22,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         timerTv = findViewById(R.id.tv_timer)
         startBtn = findViewById(R.id.btn_start)
+
         val startTime = 10
 
         timer = if (savedInstanceState != null) {
-            Timer(WeakReference(timerTv), startTime, savedInstanceState.getInt("time"))
+            Timer(WeakReference(timerTv), startTime, savedInstanceState.getInt(TIMER))
         } else Timer(WeakReference(timerTv), startTime)
 
         startBtn.setOnClickListener {
@@ -31,6 +36,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt("time", timer.currentTime)
+        outState.putInt(TIMER, timer.currentTime)
     }
 }
