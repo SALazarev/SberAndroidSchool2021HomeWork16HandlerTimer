@@ -27,11 +27,18 @@ class MainActivity : AppCompatActivity() {
 
         timer = if (savedInstanceState != null) {
             Timer(WeakReference(timerTv), startTime, savedInstanceState.getInt(TIMER))
-        } else Timer(WeakReference(timerTv), startTime)
+        } else {
+            Timer(WeakReference(timerTv), startTime)
+        }
 
         startBtn.setOnClickListener {
             timer.start()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        timer.stop()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
