@@ -1,42 +1,35 @@
-import android.os.Handler
-import android.os.Looper
+import android.util.Log
 import android.widget.TextView
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.lang.ref.WeakReference
+import java.util.concurrent.TimeUnit
 
-class Timer(textView: WeakReference<TextView>, private val startTime: Int) {
-    var currentTime: Int = startTime
-    private var handler: Handler = Handler(Looper.getMainLooper())
-    private var runnable: Runnable
+class Timer(val textView: WeakReference<TextView>, var currentTime: Int, private val allTime: Int = currentTime) {
+    val observable: Observable<Int>
+    var disposable: Disposable? = null
 
     init {
         textView.get()?.text = currentTime.toString()
-        runnable = object : Runnable {
-            override fun run() {
-                if (currentTime >= 0) {
-                    textView.get()?.text = (currentTime).toString()
-                    if (currentTime > 0) --currentTime
-                    handler.postDelayed(this, 1000)
-                } else handler.removeCallbacks(this)
-            }
-        }
+        observable = Observable.interval(0,1, TimeUnit.SECONDS)
+            .take(currentTime.toLong()+1)
+            .map { --currentTime }
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+        if (currentTime!=allTime) start(currentTime)
     }
 
-    constructor(textView: WeakReference<TextView>, startTime: Int, buffTime: Int) : this(
-        textView,
-        startTime
-    ) {
-        currentTime = buffTime
-        if (buffTime != startTime) start(buffTime)
-        textView.get()?.text = buffTime.toString()
-    }
-
-    fun start(time: Int = startTime) {
-        currentTime = time
-        handler.removeCallbacks(runnable)
-        handler.post(runnable)
+    fun start(time: Int = allTime) {
+        stop()
+        currentTime = time+1
+        disposable = observable.subscribe { textView.get()?.text = it.toString() }
     }
 
     fun stop() {
-        handler.removeCallbacks(runnable)
+        if (disposable != null) {
+            disposable?.dispose()
+        }
     }
 }
