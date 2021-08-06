@@ -18,22 +18,28 @@ class Timer(
 
     init {
         textView.get()?.text = currentTime.toString()
-        if (currentTime != allTime && currentTime>=0) start(currentTime)
+        if (currentTime != allTime && currentTime >= 0) start(currentTime)
     }
 
     fun start(time: Int = allTime) {
         stop()
-        currentTime = time + 1
-        getObservable().subscribe(getObserver())
-    }
-
-    private fun getObservable(): Observable<Int> {
-
-        return Observable.interval(0, 1, TimeUnit.SECONDS)
-            .take(currentTime.toLong())
-            .map { --currentTime }
+        getObservable(time)
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(getObserver())
+    }
+
+    fun stop() {
+        if (disposable != null) {
+            disposable?.dispose()
+        }
+    }
+
+    private fun getObservable(_time: Int): Observable<Int> {
+        var time = _time + 1
+        return Observable.interval(0, 1, TimeUnit.SECONDS)
+            .take(time.toLong())
+            .map { --time }
     }
 
     private fun getObserver(): Observer<Int> {
@@ -43,17 +49,12 @@ class Timer(
             }
 
             override fun onNext(value: Int) {
+                currentTime = value
                 textView.get()?.text = value.toString()
             }
 
             override fun onError(e: Throwable) {}
             override fun onComplete() {}
-        }
-    }
-
-    fun stop() {
-        if (disposable != null) {
-            disposable?.dispose()
         }
     }
 }

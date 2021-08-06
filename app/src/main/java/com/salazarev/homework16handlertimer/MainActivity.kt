@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         val startTime = 10
 
         timer = if (savedInstanceState != null) {
-            Timer(WeakReference(timerTv), savedInstanceState.getInt(TIMER),startTime)
+            Timer(WeakReference(timerTv), savedInstanceState.getInt(TIMER), startTime)
         } else {
             Timer(WeakReference(timerTv), startTime)
         }
