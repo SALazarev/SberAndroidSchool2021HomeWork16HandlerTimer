@@ -1,6 +1,5 @@
 package com.salazarev.homework16handlertimer
 
-import Timer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
